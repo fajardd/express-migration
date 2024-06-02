@@ -12,10 +12,10 @@ exports.getAllUsers = async (req, res) => {
     });
 
     const formattedUsers = users.map((user) => ({
-      id: user.id,
+      id_user: user.id,
       nama: user.nama,
       role: {
-        id: user.Role.id,
+        id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
     }));
@@ -46,10 +46,10 @@ exports.getUserById = async (req, res) => {
     }
 
     const formattedUser = {
-      id: user.id,
+      id_user: user.id,
       nama: user.nama,
       role: {
-        id: user.Role.id,
+        id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
     };
@@ -67,8 +67,8 @@ exports.getUserById = async (req, res) => {
 // Membuat pengguna baru
 exports.createUser = async (req, res) => {
   try {
-    const { nama, roleId } = req.body;
-    const user = await User.create({ nama, roleId });
+    const { nama, id_role } = req.body;
+    const user = await User.create({ nama, id_role });
 
     const createdUser = await User.findByPk(user.id, {
       include: {
@@ -80,14 +80,15 @@ exports.createUser = async (req, res) => {
 
     const formattedUser = {
       data: {
-        id: createdUser.id,
+        id_user: createdUser.id,
         nama: createdUser.nama,
-        Role: {
-          id: createdUser.Role.id,
+        role: {
+          id_role: createdUser.Role.id,
           role_name: createdUser.Role.role_name,
         },
       },
       message: "User created successfully",
+      status: "1",
     };
 
     res.status(201).json(formattedUser);
@@ -99,7 +100,7 @@ exports.createUser = async (req, res) => {
 // Memperbarui pengguna berdasarkan ID
 exports.updateUser = async (req, res) => {
   try {
-    const { nama, roleId } = req.body;
+    const { nama, id_role } = req.body;
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
@@ -107,7 +108,7 @@ exports.updateUser = async (req, res) => {
     }
 
     user.nama = nama;
-    user.roleId = roleId;
+    user.id_role = id_role;
     await user.save();
 
     const updatedUser = await User.findByPk(user.id, {
@@ -120,14 +121,15 @@ exports.updateUser = async (req, res) => {
 
     const formattedUser = {
       data: {
-        id: updatedUser.id,
+        id_user: updatedUser.id,
         nama: updatedUser.nama,
-        Role: {
-          id: updatedUser.Role.id,
+        role: {
+          id_role: updatedUser.Role.id,
           role_name: updatedUser.Role.role_name,
         },
       },
       message: "User updated successfully",
+      status: "1",
     };
 
     res.json(formattedUser);
@@ -146,7 +148,7 @@ exports.deleteUser = async (req, res) => {
     }
 
     await user.destroy();
-    res.json({ message: "User deleted successfully" });
+    res.status(200).json({ message: "User deleted successfully", status: "1" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

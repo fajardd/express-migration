@@ -11,7 +11,7 @@ module.exports = {
       nama: {
         type: Sequelize.STRING,
       },
-      roleId: {
+      id_role: {
         type: Sequelize.UUID,
         references: {
           model: "Roles",
