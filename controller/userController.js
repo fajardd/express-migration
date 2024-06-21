@@ -8,7 +8,7 @@ exports.getAllUsers = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama"],
+      attributes: ["id", "nama", "no_telp", "password"],
     });
 
     const formattedUsers = users.map((user) => ({
@@ -18,6 +18,8 @@ exports.getAllUsers = async (req, res) => {
         id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
+      no_telp: user.no_telp,
+      password: user.password,
     }));
 
     res.status(200).json({
@@ -38,7 +40,7 @@ exports.getUserById = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama"],
+      attributes: ["id", "nama", "no_telp", "password"],
     });
 
     if (!user) {
@@ -52,6 +54,8 @@ exports.getUserById = async (req, res) => {
         id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
+      no_telp: user.no_telp,
+      password: user.password,
     };
 
     res.status(200).json({
@@ -67,15 +71,15 @@ exports.getUserById = async (req, res) => {
 // Membuat pengguna baru
 exports.createUser = async (req, res) => {
   try {
-    const { nama, id_role } = req.body;
-    const user = await User.create({ nama, id_role });
+    const { nama, id_role, no_telp, password } = req.body;
+    const user = await User.create({ nama, id_role, no_telp, password });
 
     const createdUser = await User.findByPk(user.id, {
       include: {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama"],
+      attributes: ["id", "nama", "no_telp", "password"],
     });
 
     const formattedUser = {
@@ -86,6 +90,8 @@ exports.createUser = async (req, res) => {
           id_role: createdUser.Role.id,
           role_name: createdUser.Role.role_name,
         },
+        no_telp: createdUser.no_telp,
+        password: createdUser.password,
       },
       message: "User created successfully",
       status: "1",
@@ -100,7 +106,7 @@ exports.createUser = async (req, res) => {
 // Memperbarui pengguna berdasarkan ID
 exports.updateUser = async (req, res) => {
   try {
-    const { nama, id_role } = req.body;
+    const { nama, id_role, no_telp, password } = req.body;
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
@@ -109,6 +115,8 @@ exports.updateUser = async (req, res) => {
 
     user.nama = nama;
     user.id_role = id_role;
+    user.no_telp = no_telp;
+    user.password = password;
     await user.save();
 
     const updatedUser = await User.findByPk(user.id, {
@@ -116,7 +124,7 @@ exports.updateUser = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama"],
+      attributes: ["id", "nama", "no_telp", "password"],
     });
 
     const formattedUser = {
@@ -127,6 +135,8 @@ exports.updateUser = async (req, res) => {
           id_role: updatedUser.Role.id,
           role_name: updatedUser.Role.role_name,
         },
+        no_telp: updatedUser.no_telp,
+        password: updatedUser.password,
       },
       message: "User updated successfully",
       status: "1",

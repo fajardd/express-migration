@@ -27,6 +27,14 @@ module.exports = (sequelize) => {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
+      no_telp: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
     {
       sequelize,
