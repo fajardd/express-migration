@@ -165,6 +165,41 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+// Get profile
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      include: {
+        model: Role,
+        attributes: ["id", "role_name"],
+      },
+      attributes: ["id", "nama", "no_telp"],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const formattedUser = {
+      id_user: user.id,
+      nama: user.nama,
+      role: {
+        id_role: user.Role.id,
+        role_name: user.Role.role_name,
+      },
+      no_telp: user.no_telp,
+    };
+
+    res.status(200).json({
+      data: formattedUser,
+      message: "Get profile success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // login user to get token
 exports.login = async (req, res) => {
   try {
@@ -196,7 +231,7 @@ exports.login = async (req, res) => {
     });
 
     res.status(200).json({
-      message: "Authentication successful",
+      message: "Login berhasil",
       token,
     });
   } catch (error) {
