@@ -1,4 +1,6 @@
 const { User, Role } = require("../models");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // Mendapatkan daftar semua pengguna dan peran mereka
 exports.getAllUsers = async (req, res) => {
@@ -8,7 +10,7 @@ exports.getAllUsers = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "password"],
+      attributes: ["id", "nama", "no_telp"],
     });
 
     const formattedUsers = users.map((user) => ({
@@ -19,7 +21,6 @@ exports.getAllUsers = async (req, res) => {
         role_name: user.Role.role_name,
       },
       no_telp: user.no_telp,
-      password: user.password,
     }));
 
     res.status(200).json({
@@ -159,6 +160,45 @@ exports.deleteUser = async (req, res) => {
 
     await user.destroy();
     res.status(200).json({ message: "User deleted successfully", status: "1" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// login user to get token
+exports.login = async (req, res) => {
+  try {
+    const { no_telp, password } = req.body;
+    const user = await User.findOne({ where: { no_telp } });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Authentication failed. User not found." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Authentication failed. Wrong password." });
+    }
+
+    // Membuat payload tanpa nama
+    const payload = {
+      id: user.id,
+      no_telp: user.no_telp,
+    };
+
+    // Menghasilkan token JWT
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({
+      message: "Authentication successful",
+      token,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
