@@ -9,6 +9,12 @@ app.use(express.json());
 app.use("/", userRoutes);
 app.use("/", roleRoutes);
 
+app.get("/", (req, res) => {
+  res.send(`
+    Server available
+  `);
+});
+
 const PORT = process.env.PORT || 5000;
 
 sequelize
