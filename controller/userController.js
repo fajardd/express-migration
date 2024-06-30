@@ -238,3 +238,131 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// get admin
+exports.getAdmins = async (req, res) => {
+  try {
+    // Cari role dokter
+    const adminRole = await Role.findOne({
+      where: { role_name: "Admin" },
+    });
+
+    if (!adminRole) {
+      return res.status(404).json({ message: "Role admin tidak ditemukan" });
+    }
+
+    // Cari pengguna dengan role dokter
+    const admins = await User.findAll({
+      where: { id_role: adminRole.id },
+      include: {
+        model: Role,
+        attributes: ["id", "role_name"],
+      },
+      attributes: ["id", "nama", "no_telp"],
+    });
+
+    const formattedAdmins = admins.map((admin) => ({
+      id_user: admin.id,
+      nama: admin.nama,
+      role: {
+        id_role: admin.Role.id,
+        role_name: admin.Role.role_name,
+      },
+      no_telp: admin.no_telp,
+    }));
+
+    res.status(200).json({
+      data: formattedAdmins,
+      message: "Get all admin success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// get dokter
+exports.getVeterinarians = async (req, res) => {
+  try {
+    // Cari role dokter
+    const veterinarianRole = await Role.findOne({
+      where: { role_name: "Dokter Hewan" },
+    });
+
+    if (!veterinarianRole) {
+      return res
+        .status(404)
+        .json({ message: "Role dokter hewan tidak ditemukan" });
+    }
+
+    // Cari pengguna dengan role dokter
+    const veterinarians = await User.findAll({
+      where: { id_role: veterinarianRole.id },
+      include: {
+        model: Role,
+        attributes: ["id", "role_name"],
+      },
+      attributes: ["id", "nama", "no_telp"],
+    });
+
+    const formattedVeterinarians = veterinarians.map((veterinarian) => ({
+      id_user: veterinarian.id,
+      nama: veterinarian.nama,
+      role: {
+        id_role: veterinarian.Role.id,
+        role_name: veterinarian.Role.role_name,
+      },
+      no_telp: veterinarian.no_telp,
+    }));
+
+    res.status(200).json({
+      data: formattedVeterinarians,
+      message: "Get all veterinarian success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// get dokter
+exports.getCustomers = async (req, res) => {
+  try {
+    // Cari role dokter
+    const customerRole = await Role.findOne({
+      where: { role_name: "Customer" },
+    });
+
+    if (!customerRole) {
+      return res.status(404).json({ message: "Role customer tidak ditemukan" });
+    }
+
+    // Cari pengguna dengan role dokter
+    const customers = await User.findAll({
+      where: { id_role: customerRole.id },
+      include: {
+        model: Role,
+        attributes: ["id", "role_name"],
+      },
+      attributes: ["id", "nama", "no_telp"],
+    });
+
+    const formattedCustomers = customers.map((customer) => ({
+      id_user: customer.id,
+      nama: customer.nama,
+      role: {
+        id_role: customer.Role.id,
+        role_name: customer.Role.role_name,
+      },
+      no_telp: customer.no_telp,
+    }));
+
+    res.status(200).json({
+      data: formattedCustomers,
+      message: "Get all customer success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
