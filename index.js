@@ -2,12 +2,14 @@ const express = require("express");
 const { sequelize } = require("./models");
 const userRoutes = require("./routes/userRoutes");
 const roleRoutes = require("./routes/roleRoutes");
+const historyRoutes = require("./routes/historyRoutes");
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 app.use("/", userRoutes);
 app.use("/", roleRoutes);
+app.use("/", historyRoutes);
 
 app.get("/", (req, res) => {
   res.send(`

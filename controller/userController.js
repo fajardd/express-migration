@@ -286,13 +286,13 @@ exports.getVeterinarians = async (req, res) => {
   try {
     // Cari role dokter
     const veterinarianRole = await Role.findOne({
-      where: { role_name: "Dokter Hewan" },
+      where: { role_name: "Veterinarian" },
     });
 
     if (!veterinarianRole) {
       return res
         .status(404)
-        .json({ message: "Role dokter hewan tidak ditemukan" });
+        .json({ message: "Role veterinarian tidak ditemukan" });
     }
 
     // Cari pengguna dengan role dokter
