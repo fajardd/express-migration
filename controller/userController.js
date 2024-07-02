@@ -10,7 +10,7 @@ exports.getAllUsers = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp"],
+      attributes: ["id", "nama", "no_telp", "email"],
     });
 
     const formattedUsers = users.map((user) => ({
@@ -21,6 +21,7 @@ exports.getAllUsers = async (req, res) => {
         role_name: user.Role.role_name,
       },
       no_telp: user.no_telp,
+      email: user.email,
     }));
 
     res.status(200).json({
@@ -41,7 +42,7 @@ exports.getUserById = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "password"],
+      attributes: ["id", "nama", "no_telp", "email", "password"],
     });
 
     if (!user) {
@@ -56,6 +57,7 @@ exports.getUserById = async (req, res) => {
         role_name: user.Role.role_name,
       },
       no_telp: user.no_telp,
+      email: user.email,
       password: user.password,
     };
 
@@ -72,15 +74,15 @@ exports.getUserById = async (req, res) => {
 // Membuat pengguna baru
 exports.createUser = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, password } = req.body;
-    const user = await User.create({ nama, id_role, no_telp, password });
+    const { nama, id_role, no_telp, email, password } = req.body;
+    const user = await User.create({ nama, id_role, no_telp, email, password });
 
     const createdUser = await User.findByPk(user.id, {
       include: {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "password"],
+      attributes: ["id", "nama", "no_telp", "email", "password"],
     });
 
     const formattedUser = {
@@ -92,6 +94,7 @@ exports.createUser = async (req, res) => {
           role_name: createdUser.Role.role_name,
         },
         no_telp: createdUser.no_telp,
+        email: createdUser.email,
         password: createdUser.password,
       },
       message: "User created successfully",
@@ -107,7 +110,7 @@ exports.createUser = async (req, res) => {
 // Memperbarui pengguna berdasarkan ID
 exports.updateUser = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, password } = req.body;
+    const { nama, id_role, no_telp, email, password } = req.body;
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
@@ -117,6 +120,7 @@ exports.updateUser = async (req, res) => {
     user.nama = nama;
     user.id_role = id_role;
     user.no_telp = no_telp;
+    user.email = email;
     user.password = password;
     await user.save();
 
@@ -125,7 +129,7 @@ exports.updateUser = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "password"],
+      attributes: ["id", "nama", "no_telp", "email", "password"],
     });
 
     const formattedUser = {
@@ -137,6 +141,7 @@ exports.updateUser = async (req, res) => {
           role_name: updatedUser.Role.role_name,
         },
         no_telp: updatedUser.no_telp,
+        email: updatedUser.email,
         password: updatedUser.password,
       },
       message: "User updated successfully",
@@ -173,7 +178,7 @@ exports.getProfile = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp"],
+      attributes: ["id", "nama", "no_telp", "email"],
     });
 
     if (!user) {
@@ -188,6 +193,7 @@ exports.getProfile = async (req, res) => {
         role_name: user.Role.role_name,
       },
       no_telp: user.no_telp,
+      email: user.email,
     };
 
     res.status(200).json({
@@ -203,8 +209,8 @@ exports.getProfile = async (req, res) => {
 // login user to get token
 exports.login = async (req, res) => {
   try {
-    const { no_telp, password } = req.body;
-    const user = await User.findOne({ where: { no_telp } });
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       return res
@@ -222,12 +228,12 @@ exports.login = async (req, res) => {
     // Membuat payload tanpa nama
     const payload = {
       id: user.id,
-      no_telp: user.no_telp,
+      email: user.email,
     };
 
     // Menghasilkan token JWT
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "12h",
     });
 
     res.status(200).json({
