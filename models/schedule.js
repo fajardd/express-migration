@@ -5,9 +5,13 @@ const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   class Schedule extends Model {
     static associate(models) {
-      Schedule.belongsTo(models.User, { foreignKey: "id_user" });
+      Schedule.belongsToMany(models.User, {
+        through: "ScheduleUsers",
+        foreignKey: "scheduleId",
+      });
     }
   }
+
   Schedule.init(
     {
       id: {
@@ -23,15 +27,6 @@ module.exports = (sequelize) => {
       day: {
         type: DataTypes.STRING,
         allowNull: true,
-      },
-      id_user: {
-        type: DataTypes.UUID,
-        references: {
-          model: "Users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
       },
     },
     {

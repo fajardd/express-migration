@@ -8,6 +8,7 @@ const historyRoutes = require("./routes/historyRoutes");
 const dokterRoutes = require("./routes/dokterRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const customerRoutes = require("./routes/customerRoutes");
+const scheduleRoutes = require("./routes/scheduleRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/", historyRoutes);
 app.use("/", dokterRoutes);
 app.use("/", adminRoutes);
 app.use("/", customerRoutes);
+app.use("/", scheduleRoutes);
 
 app.get("/", (req, res) => {
   res.send(`

@@ -8,6 +8,10 @@ module.exports = (sequelize) => {
     static associate(models) {
       User.belongsTo(models.Role, { foreignKey: "id_role" });
       User.hasMany(models.History, { foreignKey: "id_user" });
+      User.belongsToMany(models.Schedule, {
+        through: "ScheduleUsers",
+        foreignKey: "userId",
+      });
     }
   }
 
@@ -51,8 +55,10 @@ module.exports = (sequelize) => {
           user.password = await bcrypt.hash(user.password, salt);
         },
         beforeUpdate: async (user) => {
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(user.password, salt);
+          if (user.changed("password")) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(user.password, salt);
+          }
         },
       },
     }
