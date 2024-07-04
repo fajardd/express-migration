@@ -31,6 +31,42 @@ exports.getAllSchedule = async (req, res) => {
   }
 };
 
+// Mendapatkan pengguna berdasarkan ID
+exports.getScheduleById = async (req, res) => {
+  try {
+    const schedule = await Schedule.findByPk(req.params.id, {
+      include: {
+        model: User,
+        attributes: ["id", "nama"],
+      },
+      attributes: ["id", "day"],
+    });
+
+    if (!schedule) {
+      return res.status(404).json({ message: "Schedule not found" });
+    }
+
+    // Check if schedule.Users is defined and not empty
+    const users = schedule.Users || [];
+    const formattedSchedule = {
+      id_schedule: schedule.id,
+      day: schedule.day,
+      users: users.map((user) => ({
+        id_user: user.id,
+        nama: user.nama,
+      })),
+    };
+
+    res.status(200).json({
+      data: formattedSchedule,
+      message: "Get schedule by ID success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.createSchedule = async (req, res) => {
   try {
     const { tanggal, day, id_user } = req.body;

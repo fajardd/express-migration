@@ -5,6 +5,11 @@ const router = express.Router();
 
 //schedule
 router.get("/schedules", authenticateToken, scheduleController.getAllSchedule);
+router.get(
+  "/schedules/:id",
+  authenticateToken,
+  scheduleController.getScheduleById
+);
 router.post("/schedules", authenticateToken, scheduleController.createSchedule);
 router.put(
   "/schedules/:id",
