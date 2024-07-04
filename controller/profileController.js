@@ -35,3 +35,39 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// update profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const { nama, no_telp, email } = req.body;
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    user.nama = nama;
+    user.no_telp = no_telp;
+    user.email = email;
+    await user.save();
+
+    const updatedUser = await User.findByPk(user.id, {
+      attributes: ["id", "nama", "no_telp", "email"],
+    });
+
+    const formattedUser = {
+      data: {
+        id_profile: updatedUser.id,
+        nama: updatedUser.nama,
+        no_telp: updatedUser.no_telp,
+        email: updatedUser.email,
+      },
+      message: "Profile updated successfully",
+      status: "1",
+    };
+
+    res.json(formattedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

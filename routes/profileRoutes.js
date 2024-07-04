@@ -5,5 +5,6 @@ const router = express.Router();
 
 // Get profile
 router.get("/profile", authenticationToken, profileController.getProfile);
+router.put("/profile", authenticationToken, profileController.updateProfile);
 
 module.exports = router;
