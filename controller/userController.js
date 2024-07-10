@@ -81,6 +81,12 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { nama, id_role, no_telp, email, password } = req.body;
+
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already in use" });
+    }
+
     const user = await User.create({ nama, id_role, no_telp, email, password });
 
     const createdUser = await User.findByPk(user.id, {
