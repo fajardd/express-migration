@@ -3,15 +3,20 @@ const { User, Role } = require("../models");
 // Mendapatkan daftar semua pengguna dan peran mereka
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll({
+    const { page = 1, limit = 5 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const users = await User.findAndCountAll({
       include: {
         model: Role,
         attributes: ["id", "role_name"],
       },
       attributes: ["id", "nama", "no_telp", "email"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
-    const formattedUsers = users.map((user) => ({
+    const formattedUsers = users.rows.map((user) => ({
       id_user: user.id,
       nama: user.nama,
       role: {
@@ -24,6 +29,9 @@ exports.getAllUsers = async (req, res) => {
 
     res.status(200).json({
       data: formattedUsers,
+      totalItems: users.count,
+      totalPages: Math.ceil(users.count / limit),
+      currentPage: page,
       message: "Get all users success",
       status: "1",
     });
