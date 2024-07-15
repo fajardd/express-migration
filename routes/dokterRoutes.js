@@ -14,6 +14,11 @@ router.get(
   authenticationToken,
   dokterController.getVeterinarianDetail
 );
+router.post(
+  "/veterinarian",
+  authenticationToken,
+  dokterController.createVeterinarian
+);
 router.put(
   "/veterinarian/:id",
   authenticationToken,
