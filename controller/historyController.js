@@ -3,15 +3,19 @@ const { History, User } = require("../models");
 // Mendapatkan daftar semua history
 exports.getAllHistory = async (req, res) => {
   try {
-    const histories = await History.findAll({
+    const { page = 1, limit = 5 } = req.query;
+    const offset = (page - 1) * limit;
+    const histories = await History.findAndCountAll({
       include: {
         model: User,
         attributes: ["id", "nama"],
       },
       attributes: ["id", "tanggal", "riwayat"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
-    const formattedHistories = histories.map((history) => ({
+    const formattedHistories = histories.rows.map((history) => ({
       id_history: history.id,
       tanggal: history.tanggal,
       riwayat: history.riwayat,
@@ -23,6 +27,9 @@ exports.getAllHistory = async (req, res) => {
 
     res.status(200).json({
       data: formattedHistories,
+      totalItems: histories.count,
+      totalPages: Math.ceil(histories.count / limit),
+      currentPage: page,
       message: "Get all histories success",
       status: "1",
     });

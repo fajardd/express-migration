@@ -3,17 +3,24 @@ const { Service } = require("../models");
 // Mendapatkan daftar semua service
 exports.getAllServices = async (req, res) => {
   try {
-    const services = await Service.findAll({
+    const { page = 1, limit = 5 } = req.query;
+    const offset = (page - 1) * limit;
+    const services = await Service.findAndCountAll({
       attributes: ["id", "title", "description"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
-    const formattedServices = services.map((service) => ({
+    const formattedServices = services.rows.map((service) => ({
       id_service: service.id,
       title: service.title,
       description: service.description,
     }));
     res.status(200).json({
       data: formattedServices,
+      totalItems: services.count,
+      totalPages: Math.ceil(services.count / limit),
+      currentPage: page,
       message: "Get all services success",
       status: "1",
     });

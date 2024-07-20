@@ -22,6 +22,8 @@ exports.getVeterinarians = async (req, res) => {
         attributes: ["id", "role_name"],
       },
       attributes: ["id", "nama", "no_telp", "email"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
     const formattedVeterinarians = veterinarians.rows.map((veterinarian) => ({

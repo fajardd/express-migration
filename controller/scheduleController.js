@@ -2,16 +2,20 @@ const { Schedule, User } = require("../models");
 
 exports.getAllSchedule = async (req, res) => {
   try {
-    const schedules = await Schedule.findAll({
+    const { page = 1, limit = 5 } = req.query;
+    const offset = (page - 1) * limit;
+    const schedules = await Schedule.findAndCountAll({
       include: {
         model: User,
         attributes: ["id", "nama"],
-        through: { attributes: [] }, // Jangan sertakan atribut dari tabel penghubung
+        through: { attributes: [] },
       },
       attributes: ["id", "tanggal", "day"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
-    const formattedSchedules = schedules.map((schedule) => ({
+    const formattedSchedules = schedules.rows.map((schedule) => ({
       id_schedule: schedule.id,
       tanggal: schedule.tanggal,
       day: schedule.day,
@@ -23,6 +27,9 @@ exports.getAllSchedule = async (req, res) => {
 
     res.status(200).json({
       data: formattedSchedules,
+      totalItems: schedules.count,
+      totalPages: Math.ceil(schedules.count / limit),
+      currentPage: page,
       message: "Get all schedule success",
       status: "1",
     });
