@@ -1,31 +1,31 @@
 const express = require("express");
-const dokterController = require("../controller/dokterController");
+const dokterController = require("../controller/web/v1/dokterController");
 const authenticationToken = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Get dokter
 router.get(
-  "/veterinarian",
+  "/web/v1/veterinarian",
   authenticationToken,
   dokterController.getVeterinarians
 );
 router.get(
-  "/veterinarian/:id",
+  "/web/v1/veterinarian/:id",
   authenticationToken,
   dokterController.getVeterinarianDetail
 );
 router.post(
-  "/veterinarian",
+  "/web/v1/veterinarian",
   authenticationToken,
   dokterController.createVeterinarian
 );
 router.put(
-  "/veterinarian/:id",
+  "/web/v1/veterinarian/:id",
   authenticationToken,
   dokterController.updateVeterinarian
 );
 router.delete(
-  "/veterinarian/:id",
+  "/web/v1/veterinarian/:id",
   authenticationToken,
   dokterController.deleteVeterinarian
 );

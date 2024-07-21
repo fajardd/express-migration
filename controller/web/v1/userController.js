@@ -1,4 +1,4 @@
-const { User, Role } = require("../models");
+const { User, Role } = require("../../../models");
 
 // Mendapatkan daftar semua pengguna dan peran mereka
 exports.getAllUsers = async (req, res) => {

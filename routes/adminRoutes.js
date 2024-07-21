@@ -1,12 +1,20 @@
 const express = require("express");
-const adminController = require("../controller/adminController");
+const adminController = require("../controller/web/v1/adminController");
 const authenticateToken = require("../middleware/authMiddleware");
 const router = express.Router();
 
-router.get("/admin", authenticateToken, adminController.getAdmins);
-router.get("/admin/:id", authenticateToken, adminController.getAdminDetail);
-router.post("/admin", authenticateToken, adminController.createAdmin);
-router.put("/admin/:id", authenticateToken, adminController.updateAdmin);
-router.delete("/admin/:id", authenticateToken, adminController.deleteAdmin);
+router.get("/web/v1/admin", authenticateToken, adminController.getAdmins);
+router.get(
+  "/web/v1/admin/:id",
+  authenticateToken,
+  adminController.getAdminDetail
+);
+router.post("/web/v1/admin", authenticateToken, adminController.createAdmin);
+router.put("/web/v1/admin/:id", authenticateToken, adminController.updateAdmin);
+router.delete(
+  "web/v1/admin/:id",
+  authenticateToken,
+  adminController.deleteAdmin
+);
 
 module.exports = router;

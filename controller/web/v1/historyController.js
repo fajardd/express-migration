@@ -1,4 +1,5 @@
-const { History, User } = require("../models");
+const { History, User } = require("../../../models");
+const moment = require("moment");
 
 // Mendapatkan daftar semua history
 exports.getAllHistory = async (req, res) => {
@@ -15,15 +16,27 @@ exports.getAllHistory = async (req, res) => {
       offset: parseInt(offset),
     });
 
-    const formattedHistories = histories.rows.map((history) => ({
-      id_history: history.id,
-      tanggal: history.tanggal,
-      riwayat: history.riwayat,
-      nama: {
-        id_user: history.User.id,
-        nama: history.User.nama,
-      },
-    }));
+    const formattedHistories = histories.rows.map((history) => {
+      let formattedDate;
+      if (history.tanggal) {
+        formattedDate = moment(history.tanggal).format("DD-MM-YYYY");
+        if (formattedDate === "Invalid date") {
+          formattedDate = null;
+        }
+      } else {
+        formattedDate = null;
+      }
+
+      return {
+        id_history: history.id,
+        tanggal: formattedDate,
+        riwayat: history.riwayat,
+        user: {
+          id_user: history.User.id,
+          nama: history.User.nama,
+        },
+      };
+    });
 
     res.status(200).json({
       data: formattedHistories,
@@ -42,7 +55,15 @@ exports.getAllHistory = async (req, res) => {
 exports.createHistory = async (req, res) => {
   try {
     const { tanggal, riwayat, id_user } = req.body;
-    const history = await History.create({ tanggal, riwayat, id_user });
+    const formatTanggal = moment(tanggal, "DD-MM-YYYY").toDate();
+    if (!formatTanggal || isNaN(formatTanggal.getTime())) {
+      throw new Error("Invalid date format");
+    }
+    const history = await History.create({
+      tanggal: formatTanggal,
+      riwayat,
+      id_user,
+    });
     const createdHistory = await History.findByPk(history.id, {
       include: {
         model: User,
@@ -54,7 +75,8 @@ exports.createHistory = async (req, res) => {
     const formattedHistories = {
       data: {
         id_history: createdHistory.id,
-        tanggal: createdHistory.tanggal,
+        tanggal: moment(createdHistory.tanggal).format("DD-MM-YYYY"),
+        riwayat: createdHistory.riwayat,
         user: {
           id_user: createdHistory.User.id,
           nama: createdHistory.User.nama,
@@ -101,6 +123,28 @@ exports.getHistoryByIdUser = async (req, res) => {
     res.status(200).json({
       data: formattedHistories,
       message: "Get history by user ID success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete history
+exports.deleteHistory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const history = await History.findByPk(id);
+
+    if (!history) {
+      return res.status(404).json({ message: "History not found" });
+    }
+
+    await history.destroy();
+
+    res.status(200).json({
+      message: "History deleted successfully",
       status: "1",
     });
   } catch (error) {

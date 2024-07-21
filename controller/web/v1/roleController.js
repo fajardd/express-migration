@@ -1,4 +1,4 @@
-const { Role } = require("../models");
+const { Role } = require("../../../models");
 
 // Mendapatkan daftar semua role
 exports.getAllRoles = async (req, res) => {

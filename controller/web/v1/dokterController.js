@@ -1,4 +1,4 @@
-const { User, Role } = require("../models");
+const { User, Role } = require("../../../models");
 
 // get dokter
 exports.getVeterinarians = async (req, res) => {

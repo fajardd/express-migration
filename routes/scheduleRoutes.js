@@ -1,23 +1,31 @@
 const express = require("express");
-const scheduleController = require("../controller/scheduleController");
+const scheduleController = require("../controller/web/v1/scheduleController");
 const authenticateToken = require("../middleware/authMiddleware");
 const router = express.Router();
 
 //schedule
-router.get("/schedules", authenticateToken, scheduleController.getAllSchedule);
 router.get(
-  "/schedules/:id",
+  "/web/v1/schedules",
+  authenticateToken,
+  scheduleController.getAllSchedule
+);
+router.get(
+  "/web/v1/schedules/:id",
   authenticateToken,
   scheduleController.getScheduleById
 );
-router.post("/schedules", authenticateToken, scheduleController.createSchedule);
+router.post(
+  "/web/v1/schedules",
+  authenticateToken,
+  scheduleController.createSchedule
+);
 router.put(
-  "/schedules/:id",
+  "/web/v1/schedules/:id",
   authenticateToken,
   scheduleController.updateSchedule
 );
 router.delete(
-  "/schedules/:id",
+  "/web/v1/schedules/:id",
   authenticateToken,
   scheduleController.deleteSchedule
 );

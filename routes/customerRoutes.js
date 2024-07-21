@@ -1,26 +1,30 @@
 const express = require("express");
-const customerController = require("../controller/customerController");
+const customerController = require("../controller/web/v1/customerController");
 const authenticationToken = require("../middleware/authMiddleware");
 const router = express.Router();
 
-router.get("/customer", authenticationToken, customerController.getCustomers);
 router.get(
-  "/customer/:id",
+  "/web/v1/customer",
+  authenticationToken,
+  customerController.getCustomers
+);
+router.get(
+  "/web/v1/customer/:id",
   authenticationToken,
   customerController.getCustomerDetail
 );
 router.post(
-  "/customer",
+  "/web/v1/customer",
   authenticationToken,
   customerController.createCustomer
 );
 router.put(
-  "/customer/:id",
+  "/web/v1/customer/:id",
   authenticationToken,
   customerController.updateCustomer
 );
 router.delete(
-  "/customer/:id",
+  "/web/v1/customer/:id",
   authenticationToken,
   customerController.deleteCustomer
 );

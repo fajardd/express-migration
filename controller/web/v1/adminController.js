@@ -1,4 +1,4 @@
-const { User, Role } = require("../models");
+const { User, Role } = require("../../../models");
 
 // get admin
 exports.getAdmins = async (req, res) => {

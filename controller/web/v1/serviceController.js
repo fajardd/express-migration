@@ -1,4 +1,4 @@
-const { Service } = require("../models");
+const { Service } = require("../../../models");
 
 // Mendapatkan daftar semua service
 exports.getAllServices = async (req, res) => {

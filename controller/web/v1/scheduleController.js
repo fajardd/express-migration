@@ -1,4 +1,4 @@
-const { Schedule, User } = require("../models");
+const { Schedule, User } = require("../../../models");
 
 exports.getAllSchedule = async (req, res) => {
   try {
