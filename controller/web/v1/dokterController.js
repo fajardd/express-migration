@@ -6,13 +6,11 @@ exports.getVeterinarians = async (req, res) => {
     const { page = 1, limit = 5 } = req.query;
     const offset = (page - 1) * limit;
     const veterinarianRole = await Role.findOne({
-      where: { role_name: "Veterinarian" },
+      where: { role_name: "Dokter" },
     });
 
     if (!veterinarianRole) {
-      return res
-        .status(404)
-        .json({ message: "Role veterinarian tidak ditemukan" });
+      return res.status(404).json({ message: "Role Dokter tidak ditemukan" });
     }
 
     const veterinarians = await User.findAndCountAll({
