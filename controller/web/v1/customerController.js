@@ -19,7 +19,7 @@ exports.getCustomers = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -31,7 +31,7 @@ exports.getCustomers = async (req, res) => {
         id_role: customer.Role.id,
         role_name: customer.Role.role_name,
       },
-      no_telp: customer.no_telp,
+      username: customer.username,
       email: customer.email,
     }));
 
@@ -58,7 +58,7 @@ exports.getCustomerDetail = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     if (!customer) {
@@ -72,7 +72,7 @@ exports.getCustomerDetail = async (req, res) => {
         id_role: customer.Role.id,
         role_name: customer.Role.role_name,
       },
-      no_telp: customer.no_telp,
+      username: customer.username,
       email: customer.email,
     };
 
@@ -89,17 +89,19 @@ exports.getCustomerDetail = async (req, res) => {
 // Create customer
 exports.createCustomer = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, email, password } = req.body;
+    const { nama, id_role, username, email, password } = req.body;
 
-    const existingCustomer = await User.findOne({ where: { email } });
+    const existingCustomer = await User.findOne({ where: { username, email } });
     if (existingCustomer) {
-      return res.status(400).json({ message: "Email already in use" });
+      return res
+        .status(400)
+        .json({ message: "Username and email already in use" });
     }
 
     const customer = await User.create({
       nama,
       id_role,
-      no_telp,
+      username,
       email,
       password,
     });
@@ -109,7 +111,7 @@ exports.createCustomer = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email", "password"],
+      attributes: ["id", "nama", "username", "email", "password"],
     });
 
     const formattedCustomer = {
@@ -120,7 +122,7 @@ exports.createCustomer = async (req, res) => {
           id_role: createdCustomer.Role.id,
           role_name: createdCustomer.Role.role_name,
         },
-        no_telp: createdCustomer.no_telp,
+        username: createdCustomer.username,
         email: createdCustomer.email,
         password: createdCustomer.password,
       },
@@ -138,7 +140,14 @@ exports.createCustomer = async (req, res) => {
 exports.updateCustomer = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama, no_telp, email } = req.body;
+    const { nama, username, email } = req.body;
+
+    const existingCustomer = await User.findOne({ where: { username, email } });
+    if (existingCustomer) {
+      return res
+        .status(400)
+        .json({ message: "Username or email already in use" });
+    }
 
     const customer = await User.findByPk(id);
 
@@ -147,18 +156,18 @@ exports.updateCustomer = async (req, res) => {
     }
 
     customer.nama = nama || customer.nama;
-    customer.no_telp = no_telp || customer.no_telp;
+    customer.username = username || customer.username;
     customer.email = email || customer.email;
     await customer.save();
 
     const updatedCustomer = await User.findByPk(customer.id, {
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     const formattedCustomer = {
       id_user: updatedCustomer.id,
       nama: updatedCustomer.nama,
-      no_telp: updatedCustomer.no_telp,
+      username: updatedCustomer.username,
       email: updatedCustomer.email,
     };
 

@@ -19,7 +19,7 @@ exports.getAdmins = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -31,7 +31,7 @@ exports.getAdmins = async (req, res) => {
         id_role: admin.Role.id,
         role_name: admin.Role.role_name,
       },
-      no_telp: admin.no_telp,
+      username: admin.username,
       email: admin.email,
     }));
 
@@ -58,7 +58,7 @@ exports.getAdminDetail = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     if (!admin) {
@@ -72,7 +72,7 @@ exports.getAdminDetail = async (req, res) => {
         id_role: admin.Role.id,
         role_name: admin.Role.role_name,
       },
-      no_telp: admin.no_telp,
+      username: admin.username,
       email: admin.email,
     };
 
@@ -89,17 +89,19 @@ exports.getAdminDetail = async (req, res) => {
 // Create admin
 exports.createAdmin = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, email, password } = req.body;
+    const { nama, id_role, username, email, password } = req.body;
 
-    const existingAdmin = await User.findOne({ where: { email } });
+    const existingAdmin = await User.findOne({ where: { username, email } });
     if (existingAdmin) {
-      return res.status(400).json({ message: "Email already in use" });
+      return res
+        .status(400)
+        .json({ message: "Username and email already in use" });
     }
 
     const admin = await User.create({
       nama,
       id_role,
-      no_telp,
+      username,
       email,
       password,
     });
@@ -109,7 +111,7 @@ exports.createAdmin = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email", "password"],
+      attributes: ["id", "nama", "username", "email", "password"],
     });
 
     const formattedAdmin = {
@@ -120,7 +122,7 @@ exports.createAdmin = async (req, res) => {
           id_role: createdAdmin.Role.id,
           role_name: createdAdmin.Role.role_name,
         },
-        no_telp: createdAdmin.no_telp,
+        username: createdAdmin.username,
         email: createdAdmin.email,
         password: createdAdmin.password,
       },
@@ -138,7 +140,14 @@ exports.createAdmin = async (req, res) => {
 exports.updateAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama, no_telp, email } = req.body;
+    const { nama, username, email } = req.body;
+
+    const existingCustomer = await User.findOne({ where: { username, email } });
+    if (existingCustomer) {
+      return res
+        .status(400)
+        .json({ message: "Username or email already in use" });
+    }
 
     const admin = await User.findByPk(id);
 
@@ -147,18 +156,18 @@ exports.updateAdmin = async (req, res) => {
     }
 
     admin.nama = nama || admin.nama;
-    admin.no_telp = no_telp || admin.no_telp;
+    admin.username = username || admin.username;
     admin.email = email || admin.email;
     await admin.save();
 
     const updatedAdmin = await User.findByPk(admin.id, {
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     const formattedAdmin = {
       id_user: updatedAdmin.id,
       nama: updatedAdmin.nama,
-      no_telp: updatedAdmin.no_telp,
+      username: updatedAdmin.username,
       email: updatedAdmin.email,
     };
 

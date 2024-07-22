@@ -11,7 +11,7 @@ exports.getAllUsers = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -23,7 +23,7 @@ exports.getAllUsers = async (req, res) => {
         id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
-      no_telp: user.no_telp,
+      username: user.username,
       email: user.email,
     }));
 
@@ -48,7 +48,7 @@ exports.getUserById = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email", "password"],
+      attributes: ["id", "nama", "username", "email", "password"],
     });
 
     if (!user) {
@@ -62,7 +62,7 @@ exports.getUserById = async (req, res) => {
         id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
-      no_telp: user.no_telp,
+      username: user.username,
       email: user.email,
       password: user.password,
     };
@@ -80,21 +80,29 @@ exports.getUserById = async (req, res) => {
 // Membuat pengguna baru
 exports.createUser = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, email, password } = req.body;
+    const { nama, id_role, username, email, password } = req.body;
 
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await User.findOne({ where: { username, email } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already in use" });
+      return res
+        .status(400)
+        .json({ message: "Username and email already in use" });
     }
 
-    const user = await User.create({ nama, id_role, no_telp, email, password });
+    const user = await User.create({
+      nama,
+      id_role,
+      username,
+      email,
+      password,
+    });
 
     const createdUser = await User.findByPk(user.id, {
       include: {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email", "password"],
+      attributes: ["id", "nama", "username", "email", "password"],
     });
 
     const formattedUser = {
@@ -105,7 +113,7 @@ exports.createUser = async (req, res) => {
           id_role: createdUser.Role.id,
           role_name: createdUser.Role.role_name,
         },
-        no_telp: createdUser.no_telp,
+        username: createdUser.username,
         email: createdUser.email,
         password: createdUser.password,
       },
@@ -122,7 +130,7 @@ exports.createUser = async (req, res) => {
 // Memperbarui pengguna berdasarkan ID
 exports.updateUser = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, email, password } = req.body;
+    const { nama, id_role, username, email, password } = req.body;
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
@@ -131,7 +139,7 @@ exports.updateUser = async (req, res) => {
 
     user.nama = nama;
     user.id_role = id_role;
-    user.no_telp = no_telp;
+    user.username = username;
     user.email = email;
     user.password = password;
     await user.save();
@@ -141,7 +149,7 @@ exports.updateUser = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email", "password"],
+      attributes: ["id", "nama", "username", "email", "password"],
     });
 
     const formattedUser = {
@@ -152,7 +160,7 @@ exports.updateUser = async (req, res) => {
           id_role: updatedUser.Role.id,
           role_name: updatedUser.Role.role_name,
         },
-        no_telp: updatedUser.no_telp,
+        username: updatedUser.username,
         email: updatedUser.email,
         password: updatedUser.password,
       },

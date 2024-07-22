@@ -8,7 +8,7 @@ exports.getProfile = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     if (!user) {
@@ -22,7 +22,7 @@ exports.getProfile = async (req, res) => {
         id_role: user.Role.id,
         role_name: user.Role.role_name,
       },
-      no_telp: user.no_telp,
+      username: user.username,
       email: user.email,
     };
 
@@ -39,7 +39,15 @@ exports.getProfile = async (req, res) => {
 // update profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { nama, no_telp, email } = req.body;
+    const { nama, username, email } = req.body;
+
+    const existingCustomer = await User.findOne({ where: { username, email } });
+    if (existingCustomer) {
+      return res
+        .status(400)
+        .json({ message: "Username or email already in use" });
+    }
+
     const user = await User.findByPk(req.user.id);
 
     if (!user) {
@@ -47,19 +55,19 @@ exports.updateProfile = async (req, res) => {
     }
 
     user.nama = nama;
-    user.no_telp = no_telp;
+    user.username = username;
     user.email = email;
     await user.save();
 
     const updatedUser = await User.findByPk(user.id, {
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     const formattedUser = {
       data: {
         id_profile: updatedUser.id,
         nama: updatedUser.nama,
-        no_telp: updatedUser.no_telp,
+        username: updatedUser.username,
         email: updatedUser.email,
       },
       message: "Profile updated successfully",

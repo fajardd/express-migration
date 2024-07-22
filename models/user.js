@@ -33,7 +33,7 @@ module.exports = (sequelize) => {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      no_telp: {
+      username: {
         type: DataTypes.STRING,
         allowNull: true,
       },

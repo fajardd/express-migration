@@ -19,7 +19,7 @@ exports.getVeterinarians = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -31,7 +31,7 @@ exports.getVeterinarians = async (req, res) => {
         id_role: veterinarian.Role.id,
         role_name: veterinarian.Role.role_name,
       },
-      no_telp: veterinarian.no_telp,
+      username: veterinarian.username,
       email: veterinarian.email,
     }));
 
@@ -58,7 +58,7 @@ exports.getVeterinarianDetail = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     if (!veterinarian) {
@@ -72,7 +72,7 @@ exports.getVeterinarianDetail = async (req, res) => {
         id_role: veterinarian.Role.id,
         role_name: veterinarian.Role.role_name,
       },
-      no_telp: veterinarian.no_telp,
+      username: veterinarian.username,
       email: veterinarian.email,
     };
 
@@ -89,17 +89,21 @@ exports.getVeterinarianDetail = async (req, res) => {
 // Create veterinarian
 exports.createVeterinarian = async (req, res) => {
   try {
-    const { nama, id_role, no_telp, email, password } = req.body;
+    const { nama, id_role, username, email, password } = req.body;
 
-    const existingVeterinarian = await User.findOne({ where: { email } });
+    const existingVeterinarian = await User.findOne({
+      where: { username, email },
+    });
     if (existingVeterinarian) {
-      return res.status(400).json({ message: "Email already in use" });
+      return res
+        .status(400)
+        .json({ message: "Username and email already in use" });
     }
 
     const veterinarian = await User.create({
       nama,
       id_role,
-      no_telp,
+      username,
       email,
       password,
     });
@@ -109,7 +113,7 @@ exports.createVeterinarian = async (req, res) => {
         model: Role,
         attributes: ["id", "role_name"],
       },
-      attributes: ["id", "nama", "no_telp", "email", "password"],
+      attributes: ["id", "nama", "username", "email", "password"],
     });
 
     const formattedVeterinarian = {
@@ -120,7 +124,7 @@ exports.createVeterinarian = async (req, res) => {
           id_role: createdVeterinarian.Role.id,
           role_name: createdVeterinarian.Role.role_name,
         },
-        no_telp: createdVeterinarian.no_telp,
+        username: createdVeterinarian.username,
         email: createdVeterinarian.email,
         password: createdVeterinarian.password,
       },
@@ -138,7 +142,14 @@ exports.createVeterinarian = async (req, res) => {
 exports.updateVeterinarian = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama, no_telp, email } = req.body;
+    const { nama, username, email } = req.body;
+
+    const existingCustomer = await User.findOne({ where: { username, email } });
+    if (existingCustomer) {
+      return res
+        .status(400)
+        .json({ message: "Username or email already in use" });
+    }
 
     const veterinarian = await User.findByPk(id);
 
@@ -147,18 +158,18 @@ exports.updateVeterinarian = async (req, res) => {
     }
 
     veterinarian.nama = nama || veterinarian.nama;
-    veterinarian.no_telp = no_telp || veterinarian.no_telp;
+    veterinarian.username = username || veterinarian.username;
     veterinarian.email = email || veterinarian.email;
     await veterinarian.save();
 
     const updatedVeterinarian = await User.findByPk(veterinarian.id, {
-      attributes: ["id", "nama", "no_telp", "email"],
+      attributes: ["id", "nama", "username", "email"],
     });
 
     const formattedVeterinarian = {
       id_user: updatedVeterinarian.id,
       nama: updatedVeterinarian.nama,
-      no_telp: updatedVeterinarian.no_telp,
+      username: updatedVeterinarian.username,
       email: updatedVeterinarian.email,
     };
 
