@@ -54,7 +54,7 @@ exports.getScheduleById = async (req, res) => {
         model: User,
         attributes: ["id", "nama"],
       },
-      attributes: ["id", "day"],
+      attributes: ["id", "tanggal", "day"],
     });
 
     if (!schedule) {
@@ -65,6 +65,7 @@ exports.getScheduleById = async (req, res) => {
     const users = schedule.Users || [];
     const formattedSchedule = {
       id_schedule: schedule.id,
+      tanggal: moment(schedule.tanggal, "YYYY-MM-DD").format("DD-MM-YYYY"),
       day: schedule.day,
       users: users.map((user) => ({
         id_user: user.id,

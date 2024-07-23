@@ -1,7 +1,6 @@
 const express = require("express");
 const dokterController = require("../controller/web/v1/dokterController");
 const authMiddleware = require("../middleware/authMiddleware");
-const adminMiddleware = require("../middleware/adminMiddleware");
 const router = express.Router();
 
 // Get dokter
