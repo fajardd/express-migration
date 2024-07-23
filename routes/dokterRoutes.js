@@ -1,32 +1,33 @@
 const express = require("express");
 const dokterController = require("../controller/web/v1/dokterController");
-const authenticationToken = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
 const router = express.Router();
 
 // Get dokter
 router.get(
   "/web/v1/veterinarian",
-  authenticationToken,
+  authMiddleware,
   dokterController.getVeterinarians
 );
 router.get(
   "/web/v1/veterinarian/:id",
-  authenticationToken,
+  authMiddleware,
   dokterController.getVeterinarianDetail
 );
 router.post(
   "/web/v1/veterinarian",
-  authenticationToken,
+  authMiddleware,
   dokterController.createVeterinarian
 );
 router.put(
   "/web/v1/veterinarian/:id",
-  authenticationToken,
+  authMiddleware,
   dokterController.updateVeterinarian
 );
 router.delete(
   "/web/v1/veterinarian/:id",
-  authenticationToken,
+  authMiddleware,
   dokterController.deleteVeterinarian
 );
 

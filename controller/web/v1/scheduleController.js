@@ -3,20 +3,16 @@ const moment = require("moment");
 
 exports.getAllSchedule = async (req, res) => {
   try {
-    const { page = 1, limit = 5 } = req.query;
-    const offset = (page - 1) * limit;
-    const schedules = await Schedule.findAndCountAll({
+    const schedules = await Schedule.findAll({
       include: {
         model: User,
         attributes: ["id", "nama"],
         through: { attributes: [] },
       },
       attributes: ["id", "tanggal", "day"],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
     });
 
-    const formattedSchedules = schedules.rows.map((schedule) => ({
+    const formattedSchedules = schedules.map((schedule) => ({
       id_schedule: schedule.id,
       tanggal: moment(schedule.tanggal).format("DD-MM-YYYY"),
       day: schedule.day,
@@ -26,11 +22,22 @@ exports.getAllSchedule = async (req, res) => {
       })),
     }));
 
+    const dayOrder = [
+      "Senin",
+      "Selasa",
+      "Rabu",
+      "Kamis",
+      "Jumat",
+      "Sabtu",
+      "Minggu",
+    ];
+
+    formattedSchedules.sort((a, b) => {
+      return dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+    });
+
     res.status(200).json({
       data: formattedSchedules,
-      totalItems: schedules.count,
-      totalPages: Math.ceil(schedules.count / limit),
-      currentPage: page,
       message: "Get all schedule success",
       status: "1",
     });
@@ -130,7 +137,7 @@ exports.createSchedule = async (req, res) => {
 exports.updateSchedule = async (req, res) => {
   try {
     const { id } = req.params;
-    const { tanggal, day, id_user } = req.body;
+    const { tanggal, id_user } = req.body;
 
     // Temukan schedule berdasarkan ID
     const schedule = await Schedule.findByPk(id, {
@@ -147,7 +154,6 @@ exports.updateSchedule = async (req, res) => {
 
     // Perbarui atribut schedule
     schedule.tanggal = tanggal || schedule.tanggal;
-    schedule.day = day || schedule.day;
     await schedule.save();
 
     // Jika id_user diberikan, perbarui pengguna terkait
@@ -167,12 +173,11 @@ exports.updateSchedule = async (req, res) => {
         attributes: ["id", "nama"],
         through: { attributes: [] },
       },
-      attributes: ["id", "day", "tanggal"],
+      attributes: ["id", "tanggal"],
     });
 
     const formattedSchedule = {
       id_schedule: updatedSchedule.id,
-      day: updatedSchedule.day,
       tanggal: updatedSchedule.tanggal,
       users: updatedSchedule.Users.map((user) => user.id),
     };

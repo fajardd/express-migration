@@ -1,26 +1,26 @@
 const express = require("express");
 const serviceController = require("../controller/web/v1/serviceController");
-const authenticateToken = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.get(
   "/web/v1/services",
-  authenticateToken,
+  authMiddleware,
   serviceController.getAllServices
 );
 router.post(
   "/web/v1/services",
-  authenticateToken,
+  authMiddleware,
   serviceController.createService
 );
 router.put(
   "/web/v1/services/:id",
-  authenticateToken,
+  authMiddleware,
   serviceController.updateService
 );
 router.delete(
   "web/v1/services/:id",
-  authenticateToken,
+  authMiddleware,
   serviceController.deleteService
 );
 

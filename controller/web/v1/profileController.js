@@ -1,4 +1,5 @@
-const { User, Role } = require("../../../models");
+const { User, Role, History } = require("../../../models");
+const moment = require("moment");
 
 // Get profile
 exports.getProfile = async (req, res) => {
@@ -29,6 +30,57 @@ exports.getProfile = async (req, res) => {
     res.status(200).json({
       data: formattedUser,
       message: "Get profile success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// GET HISTORY PROFILE
+exports.getHistoryProfile = async (req, res) => {
+  try {
+    const histories = await History.findAll({
+      where: { id_user: req.user.id },
+      include: {
+        model: User,
+        attributes: ["id", "nama"],
+      },
+      attributes: ["id", "tanggal", "pelayanan", "keterangan"],
+    });
+
+    if (histories.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No history found for this user" });
+    }
+
+    const formattedHistories = histories.map((history) => {
+      let formattedDate;
+      if (history.tanggal) {
+        formattedDate = moment(history.tanggal).format("DD-MM-YYYY");
+        if (formattedDate === "Invalid date") {
+          formattedDate = null;
+        }
+      } else {
+        formattedDate = null;
+      }
+
+      return {
+        id_history: history.id,
+        tanggal: formattedDate,
+        pelayanan: history.pelayanan,
+        keterangan: history.keterangan,
+        // user: {
+        //   id_user: history.User.id,
+        //   nama: history.User.nama,
+        // },
+      };
+    });
+
+    res.status(200).json({
+      data: formattedHistories,
+      message: "Get history by user ID success",
       status: "1",
     });
   } catch (error) {

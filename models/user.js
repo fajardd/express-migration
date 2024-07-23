@@ -45,6 +45,14 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      resetPasswordToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      resetPasswordExpires: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       sequelize,
@@ -53,11 +61,13 @@ module.exports = (sequelize) => {
         beforeCreate: async (user) => {
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
+          console.log("New user password:", user.password);
         },
         beforeUpdate: async (user) => {
           if (user.changed("password")) {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(user.password, salt);
+            console.log("Updated user password:", user.password); // Tambahkan ini
           }
         },
       },

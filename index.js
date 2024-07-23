@@ -12,6 +12,7 @@ const customerRoutes = require("./routes/customerRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const dropdownRoutes = require("./routes/dropdownRoutes");
+const forgotPasswordRoutes = require("./routes/forgotPasswordRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/", customerRoutes);
 app.use("/", scheduleRoutes);
 app.use("/", serviceRoutes);
 app.use("/", dropdownRoutes);
+app.use("/", forgotPasswordRoutes);
 
 app.get("/", (req, res) => {
   res.send(`

@@ -1,26 +1,26 @@
 const express = require("express");
 const historyController = require("../controller/web/v1/historyController");
-const authenticateToken = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.get(
   "/web/v1/histories",
-  authenticateToken,
+  authMiddleware,
   historyController.getAllHistory
 );
 router.get(
   "/web/v1/histories/:id_user",
-  authenticateToken,
+  authMiddleware,
   historyController.getHistoryByIdUser
 );
 router.post(
   "/web/v1/histories",
-  authenticateToken,
+  authMiddleware,
   historyController.createHistory
 );
 router.delete(
   "/web/v1/histories/:id",
-  authenticateToken,
+  authMiddleware,
   historyController.deleteHistory
 );
 

@@ -1,32 +1,32 @@
 const express = require("express");
 const scheduleController = require("../controller/web/v1/scheduleController");
-const authenticateToken = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 //schedule
 router.get(
   "/web/v1/schedules",
-  authenticateToken,
+  authMiddleware,
   scheduleController.getAllSchedule
 );
 router.get(
   "/web/v1/schedules/:id",
-  authenticateToken,
+  authMiddleware,
   scheduleController.getScheduleById
 );
 router.post(
   "/web/v1/schedules",
-  authenticateToken,
+  authMiddleware,
   scheduleController.createSchedule
 );
 router.put(
   "/web/v1/schedules/:id",
-  authenticateToken,
+  authMiddleware,
   scheduleController.updateSchedule
 );
 router.delete(
   "/web/v1/schedules/:id",
-  authenticateToken,
+  authMiddleware,
   scheduleController.deleteSchedule
 );
 
