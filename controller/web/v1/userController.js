@@ -137,6 +137,20 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (username !== customer.username) {
+      const existingUsername = await User.findOne({ where: { username } });
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already in use" });
+      }
+    }
+
+    if (email !== customer.email) {
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
+
     user.nama = nama;
     user.id_role = id_role;
     user.username = username;

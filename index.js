@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
+const dropdownRoutes = require("./routes/dropdownRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -26,6 +27,7 @@ app.use("/", adminRoutes);
 app.use("/", customerRoutes);
 app.use("/", scheduleRoutes);
 app.use("/", serviceRoutes);
+app.use("/", dropdownRoutes);
 
 app.get("/", (req, res) => {
   res.send(`

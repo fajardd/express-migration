@@ -1,4 +1,5 @@
 const { Schedule, User } = require("../../../models");
+const moment = require("moment");
 
 exports.getAllSchedule = async (req, res) => {
   try {
@@ -17,7 +18,7 @@ exports.getAllSchedule = async (req, res) => {
 
     const formattedSchedules = schedules.rows.map((schedule) => ({
       id_schedule: schedule.id,
-      tanggal: schedule.tanggal,
+      tanggal: moment(schedule.tanggal).format("DD-MM-YYYY"),
       day: schedule.day,
       users: schedule.Users.map((user) => ({
         id_user: user.id,
@@ -77,9 +78,10 @@ exports.getScheduleById = async (req, res) => {
 exports.createSchedule = async (req, res) => {
   try {
     const { tanggal, day, id_user } = req.body;
+    const formatTanggal = moment(tanggal, "DD-MM-YYYY").toDate();
 
     // Buat schedule baru
-    const schedule = await Schedule.create({ tanggal, day });
+    const schedule = await Schedule.create({ tanggal: formatTanggal, day });
 
     // Tambahkan users ke schedule
     if (Array.isArray(id_user)) {
@@ -111,7 +113,7 @@ exports.createSchedule = async (req, res) => {
     const formattedSchedule = {
       id_schedule: createdSchedule.id,
       day: createdSchedule.day,
-      tanggal: createdSchedule.tanggal,
+      tanggal: moment(createdSchedule.tanggal).format("DD-MM-YYYY"),
       users: createdSchedule.Users.map((user) => user.id),
     };
 

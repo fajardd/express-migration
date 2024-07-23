@@ -142,17 +142,24 @@ exports.updateAdmin = async (req, res) => {
     const { id } = req.params;
     const { nama, username, email } = req.body;
 
-    const existingCustomer = await User.findOne({ where: { username, email } });
-    if (existingCustomer) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already in use" });
-    }
-
     const admin = await User.findByPk(id);
 
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
+    }
+
+    if (username !== customer.username) {
+      const existingUsername = await User.findOne({ where: { username } });
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already in use" });
+      }
+    }
+
+    if (email !== customer.email) {
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
     }
 
     admin.nama = nama || admin.nama;

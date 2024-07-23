@@ -17,7 +17,8 @@ module.exports = (sequelize) => {
         primaryKey: true,
       },
       tanggal: DataTypes.DATE,
-      riwayat: DataTypes.STRING,
+      pelayanan: DataTypes.STRING,
+      keterangan: DataTypes.STRING,
       id_user: {
         type: DataTypes.UUID,
         references: {

@@ -144,17 +144,24 @@ exports.updateVeterinarian = async (req, res) => {
     const { id } = req.params;
     const { nama, username, email } = req.body;
 
-    const existingCustomer = await User.findOne({ where: { username, email } });
-    if (existingCustomer) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already in use" });
-    }
-
     const veterinarian = await User.findByPk(id);
 
     if (!veterinarian) {
       return res.status(404).json({ message: "Veterinarian not found" });
+    }
+
+    if (username !== veterinarian.username) {
+      const existingUsername = await User.findOne({ where: { username } });
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already in use" });
+      }
+    }
+
+    if (email !== veterinarian.email) {
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
     }
 
     veterinarian.nama = nama || veterinarian.nama;

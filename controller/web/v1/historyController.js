@@ -11,7 +11,7 @@ exports.getAllHistory = async (req, res) => {
         model: User,
         attributes: ["id", "nama"],
       },
-      attributes: ["id", "tanggal", "riwayat"],
+      attributes: ["id", "tanggal", "pelayanan", "keterangan"],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -30,7 +30,8 @@ exports.getAllHistory = async (req, res) => {
       return {
         id_history: history.id,
         tanggal: formattedDate,
-        riwayat: history.riwayat,
+        pelayanan: history.pelayanan,
+        keterangan: history.keterangan,
         user: {
           id_user: history.User.id,
           nama: history.User.nama,
@@ -54,14 +55,15 @@ exports.getAllHistory = async (req, res) => {
 // membuat history riwayat baru
 exports.createHistory = async (req, res) => {
   try {
-    const { tanggal, riwayat, id_user } = req.body;
+    const { tanggal, pelayanan, keterangan, id_user } = req.body;
     const formatTanggal = moment(tanggal, "DD-MM-YYYY").toDate();
     if (!formatTanggal || isNaN(formatTanggal.getTime())) {
       throw new Error("Invalid date format");
     }
     const history = await History.create({
       tanggal: formatTanggal,
-      riwayat,
+      pelayanan,
+      keterangan,
       id_user,
     });
     const createdHistory = await History.findByPk(history.id, {
@@ -69,14 +71,15 @@ exports.createHistory = async (req, res) => {
         model: User,
         attributes: ["id", "nama"],
       },
-      attributes: ["id", "tanggal", "riwayat"],
+      attributes: ["id", "tanggal", "pelayanan", "keterangan"],
     });
 
     const formattedHistories = {
       data: {
         id_history: createdHistory.id,
         tanggal: moment(createdHistory.tanggal).format("DD-MM-YYYY"),
-        riwayat: createdHistory.riwayat,
+        pelayanan: createdHistory.pelayanan,
+        keterangan: createdHistory.keterangan,
         user: {
           id_user: createdHistory.User.id,
           nama: createdHistory.User.nama,
@@ -94,14 +97,18 @@ exports.createHistory = async (req, res) => {
 // Mendapatkan pengguna berdasarkan ID
 exports.getHistoryByIdUser = async (req, res) => {
   try {
+    const { page = 1, limit = 5 } = req.query;
+    const offset = (page - 1) * limit;
     const id_user = req.params.id_user;
-    const histories = await History.findAll({
+    const histories = await History.findAndCountAll({
       where: { id_user: id_user },
       include: {
         model: User,
         attributes: ["id", "nama"],
       },
-      attributes: ["id", "tanggal", "riwayat"],
+      attributes: ["id", "tanggal", "pelayanan", "keterangan"],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
     if (histories.length === 0) {
@@ -110,10 +117,11 @@ exports.getHistoryByIdUser = async (req, res) => {
         .json({ message: "No history found for this user" });
     }
 
-    const formattedHistories = histories.map((history) => ({
+    const formattedHistories = histories.rows.map((history) => ({
       id_history: history.id,
-      tanggal: history.tanggal,
-      riwayat: history.riwayat,
+      tanggal: moment(history.tanggal).format("DD-MM-YYYY"),
+      pelayanan: history.pelayanan,
+      keterangan: history.keterangan,
       user: {
         id_user: history.User.id,
         nama: history.User.nama,
@@ -122,6 +130,9 @@ exports.getHistoryByIdUser = async (req, res) => {
 
     res.status(200).json({
       data: formattedHistories,
+      totalItems: histories.count,
+      totalPages: Math.ceil(histories.count / limit),
+      currentPage: page,
       message: "Get history by user ID success",
       status: "1",
     });
