@@ -31,6 +31,32 @@ exports.getAllServices = async (req, res) => {
   }
 };
 
+exports.getServiceById = async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.id, {
+      attributes: ["id", "title", "description"],
+    });
+
+    if (!service) {
+      return res.status(200).json({ message: "Service not found" });
+    }
+
+    const formattedService = {
+      id_service: service.id,
+      title: service.title,
+      description: service.description,
+    };
+
+    res.status(200).json({
+      data: formattedService,
+      message: "Get service by id success",
+      status: "1",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Membuat service baru
 exports.createService = async (req, res) => {
   try {
@@ -93,13 +119,15 @@ exports.updateService = async (req, res) => {
 // Menghapus service berdasarkan ID
 exports.deleteService = async (req, res) => {
   try {
-    const services = await Service.findByPk(req.params.id);
+    const { id } = req.params;
 
-    if (!services) {
+    const service = await Service.findByPk(id);
+
+    if (!service) {
       return res.status(404).json({ message: "Service not found" });
     }
 
-    await services.destroy();
+    await service.destroy();
     res
       .status(200)
       .json({ message: "Service deleted successfully", status: "1" });
